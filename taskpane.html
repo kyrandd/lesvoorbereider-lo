@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lesvoorbereider LO</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<script src="logic.js"></script>
+<style>
+:root{
+  --bg:#f3f5f4; --surface:#fff; --sunk:#e8ecea; --line:#d3dad6; --fg:#16201c; --muted:#5b6862;
+  --accent:#0d6b57; --accent-ink:#fff; --accent-soft:#dcefe8; --mark:#e3b40b; --mark-soft:#fbf1cc;
+  --ok:#1f7a45; --ok-soft:#dff3e6; --warn:#9a6400; --warn-soft:#fdf0d4; --bad:#b3261e; --bad-soft:#fbe3e1; --info:#36598f; --info-soft:#e2eaf7;
+  --body:"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0f1513; --surface:#161e1b; --sunk:#1d2723; --line:#2c3833; --fg:#e4ebe7; --muted:#97a69f;
+  --accent:#3fb592; --accent-ink:#06120e; --accent-soft:#183a30; --mark:#f0c53a; --mark-soft:#3a3214;
+  --ok:#5fcf8c; --ok-soft:#173726; --warn:#f0b54a; --warn-soft:#3b2d12; --bad:#ff8a80; --bad-soft:#3d1c1a; --info:#8fb2ea; --info-soft:#1c2840; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:13.5px;line-height:1.45}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 12px 0}
+.brand{display:flex;align-items:center;gap:8px}
+.logo{width:26px;height:26px;border-radius:5px;background:var(--accent);position:relative;flex:none}
+.logo::before{content:"";position:absolute;inset:5px;border:2px solid var(--mark);border-radius:50%}
+.logo::after{content:"";position:absolute;left:12px;top:0;bottom:0;width:2px;background:var(--mark)}
+.brand b{font-size:15px;flex:1}
+.live{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.tabs{display:flex;gap:2px;margin-top:8px}
+.tabs button{border:none;background:none;border-bottom:3px solid transparent;border-radius:0;padding:6px 8px;color:var(--muted);font-weight:600}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--mark)}
+main{padding:12px;display:grid;gap:12px}
+button{font:inherit;cursor:pointer;border-radius:5px;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:6px 10px;font-weight:600}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--mark);outline-offset:1px}
+.row{display:flex;flex-wrap:wrap;gap:6px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:12px}
+.card h2{margin:0 0 4px;font-size:15px}
+.eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.tip{margin:6px 0 0;color:var(--muted)}
+.cur{margin-top:8px;padding:8px;border-radius:5px;background:var(--sunk);white-space:pre-wrap;max-height:120px;overflow:auto;font-size:12.5px}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.info{background:var(--info-soft);color:var(--info)}
+ul.iss{margin:6px 0 0;padding-left:18px}
+ul.iss li{margin:2px 0}
+.chk{border-left:4px solid var(--line);background:var(--surface);border-radius:6px;padding:8px 10px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.chk.ok{border-left-color:var(--ok)}.chk.warn{border-left-color:var(--warn)}.chk.bad{border-left-color:var(--bad)}.chk.info{border-left-color:var(--info)}
+.chk .t{font-weight:600;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.chk .s{font-family:Consolas,monospace;font-size:11px;color:var(--muted)}
+.chk ul{margin:4px 0 0;padding-left:16px;color:var(--muted)}
+.list{display:grid;gap:6px}
+.out{white-space:pre-wrap;background:var(--accent-soft);border-radius:6px;padding:10px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent)}
+.out.plain{background:var(--surface);border-color:var(--line)}
+label{display:grid;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
+input,select,textarea{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:6px 8px;width:100%}
+textarea{resize:vertical;min-height:56px}
+.note{font-size:12px;color:var(--muted)}
+.warnbox{background:var(--mark-soft);border-radius:6px;padding:8px 10px;font-size:12.5px}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:r .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes r{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.msg{display:grid;gap:8px}
+.bubble{padding:8px 10px;border-radius:8px;white-space:pre-wrap}
+.bubble.u{background:var(--sunk);justify-self:end;max-width:90%}
+.bubble.a{background:var(--surface);border:1px solid var(--line)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo" aria-hidden="true"></div><b>Lesvoorbereider LO</b><span class="live" id="live"><span class="dot"></span>kijkt mee</span><button id="btnSet" title="Instellingen" aria-label="Instellingen">⚙</button></div>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="mee" aria-selected="true">Meekijken</button>
+    <button role="tab" data-tab="les" aria-selected="false">Hele les</button>
+    <button role="tab" data-tab="vraag" aria-selected="false">Vraag</button>
+  </div>
+</header>
+<main>
+  <section id="setup" hidden></section>
+  <section id="tab-mee"></section>
+  <section id="tab-les" hidden></section>
+  <section id="tab-vraag" hidden></section>
+</main>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store = { get(k,d){ try{ const v=localStorage.getItem("lvlo-"+k); return v==null?d:v; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem("lvlo-"+k,v); }catch(e){} } };
+
+const MODELS = [["claude-sonnet-5-5","Claude Sonnet 5.5 (aanbevolen)"],["claude-opus-5-5","Claude Opus 5.5 (sterkst, duurder)"],["claude-haiku-5-5","Claude Haiku 5.5 (snelst, goedkoopst)"]];
+const state = { tab:"mee", ctx:null, field:null, busy:false, result:null, docCheck:null, mentor:null, chat:[] };
+
+/* ================= Office-start ================= */
+let inWord = false;
+Office.onReady(info => {
+  inWord = info.host === Office.HostType.Word;
+  if (inWord) {
+    Office.context.document.addHandlerAsync(Office.EventType.DocumentSelectionChanged, () => { clearTimeout(state.t); state.t = setTimeout(follow, 350); });
+    follow();
+  }
+  renderAll();
+});
+
+/* ================= Word lezen ================= */
+async function readCursor(){
+  return Word.run(async ctx => {
+    const sel = ctx.document.getSelection(); sel.load("text");
+    const para = sel.paragraphs.getFirst(); para.load("text");
+    const cell = sel.parentTableCellOrNullObject; cell.load("rowIndex,cellIndex");
+    const table = sel.parentTableOrNullObject; table.load("values");
+    await ctx.sync();
+    let before = "";
+    if (!cell.isNullObject) {
+      try { const r = cell.body.getRange("Start").expandTo(sel.getRange("Start")); r.load("text"); await ctx.sync(); before = r.text; } catch(e) { before = ""; }
+    }
+    const head = table.isNullObject ? "" : (table.values?.[0]?.[0] || "");
+    return { head, row: cell.isNullObject ? -1 : cell.rowIndex, col: cell.isNullObject ? -1 : cell.cellIndex, para: para.text, before, selText: sel.text };
+  });
+}
+async function readTables(){
+  return Word.run(async ctx => {
+    const ts = ctx.document.body.tables; ts.load("items/values");
+    await ctx.sync();
+    return ts.items.map(t => t.values);
+  });
+}
+async function follow(){
+  if (!inWord) return;
+  try {
+    const c = await readCursor();
+    const f = LV.classify(c);
+    const changed = !state.field || state.field.key !== f.key || state.field.fase !== f.fase;
+    state.ctx = c; state.field = f;
+    if (changed) state.result = null;
+    if (state.tab === "mee") renderMee();
+  } catch(e) { /* cursor buiten bereik: negeren */ }
+}
+
+/* ================= Word schrijven ================= */
+const LABEL_RE = /^\s*[‘'’]?\s*(lesonderwerp|leerplan|algemene afspraken met de groep|plaatsen materiaal|opruimen materiaal|naam|situatie|opdracht|progressie|regressie|afspraken|adp|remedi[eë]ring|overgang|lg|bd|pd)\s*:?/i;
+async function setLabeledValue(ctx, para, text, value){
+  const m = text.match(LABEL_RE);
+  const v = String(value).replace(/\r?\n/g, "\v");
+  if (!m) { para.insertText(v, "Replace"); return; }
+  const lab = m[0].trim();
+  const hits = para.search(lab, { matchCase:false }); hits.load("items"); await ctx.sync();
+  if (!hits.items.length) { para.insertText(" " + v, "End"); return; }
+  const after = hits.items[0].getRange("End").expandTo(para.getRange("End"));
+  after.insertText(" " + v, "Replace");
+}
+async function writeField(mode, value){
+  return Word.run(async ctx => {
+    const sel = ctx.document.getSelection();
+    if (mode === "cursor") { sel.insertText(String(value).replace(/\r?\n/g, "\v"), "Replace"); await ctx.sync(); return; }
+    const para = sel.paragraphs.getFirst(); para.load("text"); await ctx.sync();
+    await setLabeledValue(ctx, para, para.text, value); await ctx.sync();
+  });
+}
+// Vul een volledige oefeningsrij (lesfasedoel · oefenstof · didactisch handelen) + LG-rij erboven
+async function writeExercise(ex){
+  return Word.run(async ctx => {
+    const sel = ctx.document.getSelection();
+    const cell = sel.parentTableCellOrNullObject; cell.load("rowIndex");
+    const table = sel.parentTableOrNullObject; table.load("rowCount");
+    await ctx.sync();
+    if (cell.isNullObject || table.isNullObject) throw new Error("Zet je cursor in de rij van een oefening.");
+    const row = cell.parentRow; row.cells.load("items"); await ctx.sync();
+    const cells = row.cells.items;
+    if (cells.length < 3) throw new Error("Zet je cursor in de rij van een oefening (3 kolommen).");
+    const map = { naam:"naam", situatie:"situatie", opdracht:"opdracht", progressie:"progressie", regressie:"regressie", afspraken:"afspraken", adp:"adp", "remediëring":"remediering", remediering:"remediering", overgang:"overgang" };
+    // kolom 1: lesfasedoel (met timing vooraan als die er al stond)
+    if (ex.fasedoel) { const b = cells[0].body; b.load("text"); await ctx.sync(); const tm = (b.text.match(/^\s*(\d+\s*['’′])/)||[])[1]; b.insertText((tm? tm+" ":"") + ex.fasedoel, "Replace"); }
+    for (const ci of [1, 2]) {
+      const ps = cells[ci].body.paragraphs; ps.load("items/text"); await ctx.sync();
+      for (const p of ps.items) {
+        const m = p.text.match(LABEL_RE); if (!m) continue;
+        const key = map[m[1].toLowerCase()]; if (!key || ex[key] == null || ex[key] === "") continue;
+        await setLabeledValue(ctx, p, p.text, ex[key]);
+      }
+      await ctx.sync();
+    }
+    // LG in de rij erboven
+    if (ex.lg) {
+      table.rows.load("items"); await ctx.sync();
+      const prev = table.rows.items[cell.rowIndex - 1];
+      if (prev) { prev.cells.load("items"); await ctx.sync(); const c2 = prev.cells.items[2];
+        if (c2) { const ps = c2.body.paragraphs; ps.load("items/text"); await ctx.sync(); const p = ps.items.find(p => /^\s*LG\b/i.test(p.text)); if (p) await setLabeledValue(ctx, p, p.text, ex.lg); } }
+    }
+    await ctx.sync();
+  });
+}
+
+/* ================= Claude-API ================= */
+function apiKey(){ return store.get("key",""); }
+function model(){ return store.get("model", MODELS[0][0]); }
+async function claude(prompt, maxTokens = 1800){
+  const key = apiKey(); if (!key) throw new Error("Geen API-sleutel. Open de instellingen (⚙).");
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST",
+    headers:{ "content-type":"application/json", "x-api-key":key, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
+    body: JSON.stringify({ model:model(), max_tokens:maxTokens, system:LV.REGELS, messages: Array.isArray(prompt)? prompt : [{ role:"user", content:prompt }] })
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const m = j?.error?.message || r.statusText;
+    if (r.status === 401) throw new Error("De API-sleutel wordt geweigerd. Controleer hem in de instellingen.");
+    if (r.status === 429) throw new Error("Even te veel aanvragen. Probeer het over een minuut opnieuw.");
+    if (r.status === 400 && /credit|billing/i.test(m)) throw new Error("Je API-tegoed is op. Vul het aan op console.anthropic.com.");
+    throw new Error("Claude gaf een fout: " + m);
+  }
+  return (j.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
+}
+function parseJSON(t){
+  try { return JSON.parse(t); } catch(e) {}
+  const f = t.match(/```(?:json)?\s*([\s\S]*?)```/); if (f) { try { return JSON.parse(f[1]); } catch(e) {} }
+  const a = t.indexOf("{"), b = t.lastIndexOf("}"); if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)); } catch(e) {} }
+  throw new Error("Het antwoord kon niet gelezen worden. Probeer opnieuw.");
+}
+
+/* ================= Weergave ================= */
+function renderAll(){
+  const needKey = !apiKey();
+  $("#setup").hidden = !(needKey || state.showSet);
+  if (!$("#setup").hidden) renderSetup(needKey);
+  for (const t of ["mee","les","vraag"]) $("#tab-"+t).hidden = state.tab !== t;
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === state.tab)));
+  $("#live").hidden = !inWord;
+  if (state.tab === "mee") renderMee(); else if (state.tab === "les") renderLes(); else renderVraag();
+}
+function renderSetup(needKey){
+  $("#setup").innerHTML = `<div class="card"><h2>${needKey? "Eenmalig instellen" : "Instellingen"}</h2>
+    <p class="tip">De lesvoorbereider gebruikt Claude via je eigen API-sleutel. Maak er een aan op <b>console.anthropic.com</b> → API Keys en zet er een klein tegoed op.</p>
+    <div style="display:grid;gap:8px;margin-top:8px">
+      <label for="key">API-sleutel<input id="key" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(apiKey())}"></label>
+      <label for="model">Model<select id="model">${MODELS.map(([v,l]) => `<option value="${v}" ${v===model()?"selected":""}>${l}</option>`).join("")}</select></label>
+      <div class="row"><button class="primary" id="saveSet">Opslaan</button>${needKey?"":`<button id="closeSet">Sluiten</button>`}</div>
+      <p class="warnbox">De sleutel blijft enkel op deze computer. Deel dit zijpaneel niet met anderen zolang je sleutel erin staat. Gebruik in je voorbereiding geen namen van kinderen: alles wat je laat nakijken, gaat naar Claude.</p>
+    </div></div>`;
+}
+const ST = { ok:["ok","In orde"], warn:["warn","Let op"], bad:["bad","Ontbreekt"], info:["info","Zelf doen"] };
+function issuesHtml(iss){ return iss.length ? `<ul class="iss">${iss.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>` : `<p class="tip"><span class="pill ok">In orde</span> Geen automatische opmerkingen.</p>`; }
+
+function renderMee(){
+  const el = $("#tab-mee");
+  if (!inWord) { el.innerHTML = `<div class="card"><h2>Open dit in Word</h2><p class="tip">Het zijpaneel werkt binnen Microsoft Word. Open je lesvoorbereiding in het HOGENT-formulier en start de invoegtoepassing via het lint.</p></div>`; return; }
+  const f = state.field || { key:"onbekend" }, def = LV.F[f.key] || LV.F.onbekend, c = state.ctx || {};
+  const value = LV.stripLabel(c.para || "").trim();
+  const iss = f.key === "onbekend" || f.key === "fasekop" || f.key === "voorblad" ? [] : LV.checkField(f.key, value);
+  const exRow = (f.fase === "kern" || f.fase === "opwarming") && c.row >= 2 && !["fasekop","onbekend"].includes(f.key);
+  const r = state.result;
+  el.innerHTML = `
+  <div class="card">
+    <div class="eyebrow">${esc(f.fase ? f.fase : "cursor")}</div>
+    <h2>${esc(def.naam)}</h2>
+    <p class="tip">${esc(def.tip)}</p>
+    ${f.key!=="onbekend" && value ? `<div class="cur">${esc(value)}</div>` : ""}
+    ${f.key!=="onbekend" && f.key!=="fasekop" ? issuesHtml(iss) : ""}
+  </div>
+  ${f.key!=="onbekend" ? `<div class="row">
+    <button id="bFb" ${state.busy?"disabled":""}>Feedback op dit veld</button>
+    <button id="bSug" class="primary" ${state.busy?"disabled":""}>Schrijf voorstel</button>
+  </div>` : ""}
+  ${exRow ? `<div class="card"><div class="eyebrow">Hele oefening</div><p class="tip" style="margin-top:2px">Laat een volledige oefening voor deze rij uitwerken: lesfasedoel, oefenstof, didactisch handelen${f.fase==="kern"?" en het LG erboven":""}. Werkt het best in een lege rij.</p>
+    <label for="idee" style="margin-top:6px">Idee of wens (optioneel)<input id="idee" placeholder="bv. met hoepels, in golven, moeilijker dan oefening 1"></label>
+    <div class="row" style="margin-top:8px"><button id="bEx" ${state.busy?"disabled":""}>Oefening voorstellen</button></div></div>` : ""}
+  ${state.busy==="mee" ? `<div class="note"><span class="spin"></span>Claude denkt na…</div>` : ""}
+  ${r ? resultHtml(r) : ""}`;
+}
+function resultHtml(r){
+  if (r.error) return `<div class="chk bad"><div class="t">${esc(r.error)}</div></div>`;
+  if (r.type === "fb") return `<div class="card"><div class="eyebrow">Feedback</div><p style="margin:4px 0 0">${esc(r.data.oordeel||"")}</p>${(r.data.punten||[]).length?`<ul class="iss">${r.data.punten.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}
+    ${r.data.verbeterd?`<div class="eyebrow" style="margin-top:10px">Verbeterde versie</div><div class="out">${esc(r.data.verbeterd)}</div>
+    <div class="row" style="margin-top:8px"><button class="primary" data-ins="replace" data-v="verbeterd">Vervang veld</button><button data-ins="cursor" data-v="verbeterd">Invoegen bij cursor</button><button data-copy="verbeterd">Kopiëren</button></div>`:""}</div>`;
+  if (r.type === "sug") return `<div class="card"><div class="eyebrow">Voorstel</div><div class="out">${esc(r.text)}</div>
+    <div class="row" style="margin-top:8px"><button class="primary" data-ins="replace" data-v="text">Vervang veld</button><button data-ins="cursor" data-v="text">Invoegen bij cursor</button><button data-copy="text">Kopiëren</button></div></div>`;
+  if (r.type === "ex") { const e = r.data;
+    const rows = [["Lesfasedoel",e.fasedoel],["LG",e.lg],["Naam",e.naam],["Situatie",e.situatie],["Opdracht",e.opdracht],["Progressie",e.progressie],["Regressie",e.regressie],["Afspraken",e.afspraken],["ADP",e.adp],["Remediëring",e.remediering],["Overgang",e.overgang]].filter(x=>x[1]);
+    return `<div class="card"><div class="eyebrow">Voorstel oefening</div>${rows.map(([k,v])=>`<p style="margin:6px 0 0"><b>${k}:</b> <span style="white-space:pre-wrap">${esc(v)}</span></p>`).join("")}
+    <div class="row" style="margin-top:10px"><button class="primary" id="bExIns">In deze rij zetten</button><button id="bEx2">Ander voorstel</button></div></div>`; }
+  return "";
+}
+
+function renderLes(){
+  const dc = state.docCheck, m = state.mentor;
+  $("#tab-les").innerHTML = `
+  <div class="card"><h2>Controle volgens de HOGENT-checklist</h2><p class="tip">Leest je volledige voorbereiding en toetst ze aan de 12 stappen van de checklist (Basisonderwijs 2).</p>
+    <div class="row" style="margin-top:8px"><button class="primary" id="bCheck" ${!inWord||state.busy?"disabled":""}>Controleer mijn les</button><button id="bMentor" ${!inWord||state.busy?"disabled":""}>Mentorfeedback</button></div></div>
+  ${state.busy==="les"?`<div class="note"><span class="spin"></span>${esc(state.busyMsg||"Bezig…")}</div>`:""}
+  ${dc? `<div class="list">${dc.map(r=>`<div class="chk ${r.st}"><div class="t"><span class="s">${typeof r.stap==="number"?"STAP "+r.stap:r.stap}</span>${esc(r.titel)} <span class="pill ${ST[r.st][0]}">${ST[r.st][1]}</span></div>${r.punten.length?`<ul>${r.punten.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}</div>`).join("")}</div>`:""}
+  ${m? (m.error? `<div class="chk bad"><div class="t">${esc(m.error)}</div></div>` : `<div class="card"><div class="eyebrow">Mentorfeedback</div><p style="margin:4px 0 0">${esc(m.samenvatting||"")}</p></div>
+    <div class="list">${(m.punten||[]).map(p=>{const s={ok:"ok",aandacht:"warn",probleem:"bad"}[p.oordeel]||"info";return `<div class="chk ${s}"><div class="t"><span class="s">${esc(p.stap||"")}</span>${esc(p.titel||"")} <span class="pill ${s}">${{ok:"Sterk",warn:"Aandacht",bad:"Probleem",info:"Tip"}[s]}</span></div><p style="margin:4px 0 0">${esc(p.opmerking||"")}</p>${p.voorstel?`<p style="margin:4px 0 0"><b>Beter:</b> ${esc(p.voorstel)}</p>`:""}</div>`;}).join("")}</div>`) : ""}`;
+}
+function renderVraag(){
+  $("#tab-vraag").innerHTML = `
+  <div class="card"><h2>Vraag het aan je mentor</h2><p class="tip">Bv. "Geef me 3 opwarmingsspelen met hoepels", "Is mijn kern niet te moeilijk voor een 2e leerjaar?" Claude leest je volledige voorbereiding mee.</p></div>
+  <div class="msg">${state.chat.map(m=>`<div class="bubble ${m.role==="user"?"u":"a"}">${esc(m.content)}</div>`).join("")}${state.busy==="vraag"?`<div class="note"><span class="spin"></span>Claude denkt na…</div>`:""}</div>
+  <label for="q">Je vraag<textarea id="q" rows="3" placeholder="Typ je vraag…"></textarea></label>
+  <div class="row"><button class="primary" id="bAsk" ${state.busy?"disabled":""}>Versturen</button>${state.chat.length?`<button id="bClear">Gesprek wissen</button>`:""}</div>`;
+}
+
+/* ================= Acties ================= */
+async function withBusy(kind, fn, msg){
+  state.busy = kind; state.busyMsg = msg; renderAll();
+  try { await fn(); } finally { state.busy = false; renderAll(); }
+}
+async function docContext(){ const tables = await readTables(); return { tables, text: LV.docAsText(tables) }; }
+
+async function fieldFeedback(){
+  const f = state.field, def = LV.F[f.key], c = state.ctx, value = LV.stripLabel(c.para).trim();
+  await withBusy("mee", async () => {
+    try {
+      const { text } = await docContext();
+      const out = await claude(`VOLLEDIGE LESVOORBEREIDING (tabellen):\n${text}\n\nDe student staat met de cursor in het veld "${def.naam}"${f.fase?` (lesfase: ${f.fase})`:""}.\nHuidige tekst van dit veld: """${value || "(leeg)"}"""\n\nGeef als mentor kritische feedback op ENKEL dit veld, rekening houdend met de rest van de voorbereiding (doelen, klas, timing). Max. 4 korte punten. Geef daarna een verbeterde versie van de veldtekst (zonder het label, klaar om in te vullen).\nAntwoord met enkel JSON: {"oordeel":"één zin","punten":["..."],"verbeterd":"..."}`, 1200);
+      state.result = { type:"fb", data: parseJSON(out) };
+    } catch(e) { state.result = { error: e.message }; }
+  });
+}
+async function fieldSuggest(){
+  const f = state.field, def = LV.F[f.key], c = state.ctx, value = LV.stripLabel(c.para).trim();
+  await withBusy("mee", async () => {
+    try {
+      const { text } = await docContext();
+      const out = await claude(`VOLLEDIGE LESVOORBEREIDING (tabellen):\n${text}\n\nSchrijf de inhoud voor het veld "${def.naam}"${f.fase?` (lesfase: ${f.fase})`:""} zodat het past bij de rest van deze voorbereiding en voldoet aan de HOGENT-regels. ${value?`Huidige tekst (verbeter of herschrijf): """${value}"""`:"Het veld is nog leeg."}\nGeef ENKEL de tekst die in het veld komt, zonder label, zonder inleiding. Gebruik puntjes ("- ") waar het sjabloon dat vraagt.`, 900);
+      state.result = { type:"sug", text: out.replace(/^["“]|["”]$/g, "") };
+    } catch(e) { state.result = { error: e.message }; }
+  });
+}
+async function exerciseSuggest(){
+  const f = state.field, idee = ($("#idee")?.value || "").trim();
+  await withBusy("mee", async () => {
+    try {
+      const { text } = await docContext();
+      const out = await claude(`VOLLEDIGE LESVOORBEREIDING (tabellen):\n${text}\n\nDe student staat in een oefeningsrij van de ${f.fase}. Werk voor DEZE rij één volledige oefening uit die logisch past in de opbouw (geleidelijkheid, zelfde materiaal en opstelling waar mogelijk) en bijdraagt aan de lesdoelen.${idee?` Wens van de student: ${idee}.`:""}${state.result?.type==="ex"?` Geef iets anders dan "${state.result.data.naam}".`:""}\nAntwoord met enkel JSON: {"fasedoel":"De leerlingen ...","lg":"${f.fase==="kern"?"V: ...\\nA: ...":""}","naam":"","situatie":"- ...\\n- ...","opdracht":"","progressie":"","regressie":"","afspraken":"","adp":"","remediering":"verwachte fout → correctie","overgang":""}${f.fase==="opwarming"?" (opwarming: laat lg, progressie, regressie, adp en remediering leeg)":""}`, 1800);
+      state.result = { type:"ex", data: parseJSON(out) };
+    } catch(e) { state.result = { error: e.message }; }
+  });
+}
+async function checkLesson(){
+  await withBusy("les", async () => {
+    try { const tables = await readTables(); state.docCheck = LV.checkDoc(tables).R; }
+    catch(e) { state.docCheck = [{ stap:"!", titel:"Kon het document niet lezen: " + e.message, st:"bad", punten:[] }]; }
+  }, "Je voorbereiding wordt gelezen…");
+}
+async function mentor(){
+  await withBusy("les", async () => {
+    try {
+      const { tables, text } = await docContext();
+      const auto = LV.checkDoc(tables).R.filter(r => r.st === "bad" || r.st === "warn").map(r => `- ${r.titel}: ${r.punten.join(" ")}`).join("\n");
+      const out = await claude(`LESVOORBEREIDING (tabellen):\n${text}\n\nAutomatische controle vond al:\n${auto || "(niets)"}\n\nBeoordeel deze lesvoorbereiding kritisch zoals een HOGENT-praktijklector. Toets aan de 12 stappen van de checklist, de gouden regels voor doelen, lesopbouw, actieve leertijd, differentiatie, veiligheid en de didactische principes. Max. 7 punten, belangrijkste eerst; herhaal de automatische controle niet letterlijk. Geef bij elk probleem een concreet, herschreven voorstel.\nAntwoord met enkel JSON: {"samenvatting":"2 à 3 zinnen","punten":[{"stap":"Stap 4","titel":"","oordeel":"ok|aandacht|probleem","opmerking":"","voorstel":""}]}`, 2500);
+      state.mentor = parseJSON(out);
+    } catch(e) { state.mentor = { error: e.message }; }
+  }, "Claude leest je voorbereiding als mentor… (± 30 seconden)");
+}
+async function ask(){
+  const q = ($("#q")?.value || "").trim(); if (!q) return;
+  state.chat.push({ role:"user", content:q });
+  await withBusy("vraag", async () => {
+    try {
+      let ctxText = "(geen document)"; if (inWord) ctxText = (await docContext()).text;
+      const msgs = [{ role:"user", content:`Dit is mijn huidige lesvoorbereiding (tabellen):\n${ctxText}\n\nBeantwoord mijn vragen kort en concreet, als mentor.` }, { role:"assistant", content:"Ik heb je voorbereiding gelezen. Wat wil je weten?" }, ...state.chat.slice(-8)];
+      const a = await claude(msgs, 1500);
+      state.chat.push({ role:"assistant", content:a });
+    } catch(e) { state.chat.push({ role:"assistant", content:"⚠ " + e.message }); }
+  });
+}
+
+document.addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.tab) { state.tab = b.dataset.tab; renderAll(); if (state.tab === "mee") follow(); return; }
+  if (b.id === "btnSet") { state.showSet = !state.showSet; renderAll(); return; }
+  if (b.id === "saveSet") { store.set("key", $("#key").value.trim()); store.set("model", $("#model").value); state.showSet = false; renderAll(); return; }
+  if (b.id === "closeSet") { state.showSet = false; renderAll(); return; }
+  if (b.id === "bFb") return fieldFeedback();
+  if (b.id === "bSug") return fieldSuggest();
+  if (b.id === "bEx" || b.id === "bEx2") return exerciseSuggest();
+  if (b.id === "bExIns") { try { await writeExercise(state.result.data); b.textContent = "Ingevuld ✓"; } catch(err) { state.result = { error: err.message }; renderMee(); } return; }
+  if (b.dataset.ins) { const r = state.result; const v = b.dataset.v === "verbeterd" ? r.data.verbeterd : r.text;
+    try { await writeField(b.dataset.ins, v); b.textContent = "Ingevuld ✓"; } catch(err) { state.result = { error: "Invullen lukte niet: " + err.message }; renderMee(); } return; }
+  if (b.dataset.copy) { const r = state.result; const v = b.dataset.copy === "verbeterd" ? r.data.verbeterd : r.text;
+    try { await navigator.clipboard.writeText(v); b.textContent = "Gekopieerd ✓"; } catch(err) { b.textContent = "Kopiëren lukte niet"; } return; }
+  if (b.id === "bCheck") return checkLesson();
+  if (b.id === "bMentor") return mentor();
+  if (b.id === "bAsk") return ask();
+  if (b.id === "bClear") { state.chat = []; renderVraag(); return; }
+});
+document.addEventListener("keydown", e => { if (e.target.id === "q" && e.key === "Enter" && (e.ctrlKey || e.metaKey)) ask(); });
+
+renderAll();
+</script>
+</body>
+</html>

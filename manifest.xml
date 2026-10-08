@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+           xsi:type="TaskPaneApp">
+  <Id>f09047fc-95d3-407e-9162-ea020639ddab</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Kyran Durand</ProviderName>
+  <DefaultLocale>nl-NL</DefaultLocale>
+  <DisplayName DefaultValue="Lesvoorbereider LO"/>
+  <Description DefaultValue="Kijkt mee terwijl je je LO-lesvoorbereiding schrijft in het HOGENT-formulier: tips en controle per veld, voorstellen en mentorfeedback."/>
+  <IconUrl DefaultValue="https://kyrandd.github.io/lesvoorbereider-lo/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://kyrandd.github.io/lesvoorbereider-lo/assets/icon-64.png"/>
+  <SupportUrl DefaultValue="https://github.com/kyrandd/lesvoorbereider-lo"/>
+  <AppDomains>
+    <AppDomain>https://api.anthropic.com</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Document"/>
+  </Hosts>
+  <Requirements>
+    <Sets DefaultMinVersion="1.3">
+      <Set Name="WordApi" MinVersion="1.3"/>
+    </Sets>
+  </Requirements>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://kyrandd.github.io/lesvoorbereider-lo/taskpane.html"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title"/>
+            <Description resid="GetStarted.Description"/>
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+          </GetStarted>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="LVLO.Group">
+                <Label resid="Group.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16"/>
+                  <bt:Image size="32" resid="Icon.32"/>
+                  <bt:Image size="80" resid="Icon.80"/>
+                </Icon>
+                <Control xsi:type="Button" id="LVLO.Open">
+                  <Label resid="Button.Label"/>
+                  <Supertip>
+                    <Title resid="Button.Label"/>
+                    <Description resid="Button.Tooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>LVLOPane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://kyrandd.github.io/lesvoorbereider-lo/assets/icon-16.png"/>
+        <bt:Image id="Icon.32" DefaultValue="https://kyrandd.github.io/lesvoorbereider-lo/assets/icon-32.png"/>
+        <bt:Image id="Icon.80" DefaultValue="https://kyrandd.github.io/lesvoorbereider-lo/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://github.com/kyrandd/lesvoorbereider-lo"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://kyrandd.github.io/lesvoorbereider-lo/taskpane.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="GetStarted.Title" DefaultValue="Lesvoorbereider LO is klaar"/>
+        <bt:String id="Group.Label" DefaultValue="Lesvoorbereider"/>
+        <bt:String id="Button.Label" DefaultValue="Lesvoorbereider LO"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="GetStarted.Description" DefaultValue="Klik op Start > Lesvoorbereider LO om het zijpaneel te openen."/>
+        <bt:String id="Button.Tooltip" DefaultValue="Open het zijpaneel dat meekijkt met je lesvoorbereiding."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>
